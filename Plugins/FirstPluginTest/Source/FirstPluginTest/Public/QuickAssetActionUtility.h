@@ -17,4 +17,7 @@ class FIRSTPLUGINTEST_API UQuickAssetActionUtility : public UAssetActionUtility
 	public:
 		UFUNCTION(CallInEditor)
 		void TestFunc();
+
+		UFUNCTION(CallInEditor)
+		void DuplicateAsset(int NumOfDuplicate);
 };
