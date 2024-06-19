@@ -17,8 +17,8 @@
 	"Modules": [
 		{
 			"Name": "FirstPluginTest",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"Type": "Editor",
+			"LoadingPhase": "PreDefault"
 		}
 	]
 }
