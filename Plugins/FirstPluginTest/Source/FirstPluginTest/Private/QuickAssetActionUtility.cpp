@@ -24,9 +24,10 @@ void UQuickAssetActionUtility::DuplicateAsset(int NumOfDuplicate)
 
 	for (const FAssetData& assetData : selectedAssetsData)
 	{
+		const FString sourceAssetPath = assetData.ObjectPath.ToString();
+
 		for (int i = 0; i < NumOfDuplicate; i++)
 		{
-			const FString sourceAssetPath = assetData.ObjectPath.ToString();
 			const FString duplicatedAssetName = assetData.AssetName.ToString() + TEXT("_") + FString::FromInt(i + 1);
 			const FString newAssetPath = FPaths::Combine(assetData.PackagePath.ToString(), duplicatedAssetName);
 
