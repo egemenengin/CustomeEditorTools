@@ -6,6 +6,7 @@
 #include "EditorUtilityLibrary.h"
 #include "EditorAssetLibrary.h"
 
+
 void UQuickAssetActionUtility::TestFunc()
 {
 	Print(TEXT("ITS WORKING!!!"), FColor::Purple);
@@ -16,8 +17,11 @@ void UQuickAssetActionUtility::DuplicateAsset(int NumOfDuplicate)
 {
 	if (NumOfDuplicate <= 0)
 	{
-		Print(TEXT("Please Enter a Valid Number"), FColor::Red	);
+		Print(TEXT("Please Enter a Valid Number"), FColor::Red);
+		EAppReturnType::Type userReturnType = ShowMessageDialog(EAppMsgType::Ok, TEXT("Please Enter a Valid Number"));
+
 		return;
+
 	}
 	TArray<FAssetData> selectedAssetsData = UEditorUtilityLibrary::GetSelectedAssetData();
 	uint32 counter = 0;
@@ -41,6 +45,7 @@ void UQuickAssetActionUtility::DuplicateAsset(int NumOfDuplicate)
 		}
 		const FString& duplicatedMessage = assetData.AssetName.ToString() + TEXT(" has been duplicated ") + FString::FromInt(counter) + TEXT(" times.");
 		PrintLog(duplicatedMessage);
+		ShowNotifyInfo(duplicatedMessage);
 		counter = 0;
 	}
 }
