@@ -49,3 +49,44 @@ void UQuickAssetActionUtility::DuplicateAsset(int NumOfDuplicate)
 		counter = 0;
 	}
 }
+
+void UQuickAssetActionUtility::AddPrefix()
+{
+	TArray<UObject*> selectedObjects = UEditorUtilityLibrary::GetSelectedAssets();
+	uint32 counter = 0;
+
+	for (UObject* selectedObject : selectedObjects)
+	{
+		if (!selectedObject) continue;
+		
+		FString* foundedPrefix = PrefixMap.Find(selectedObject->GetClass());
+		
+		if (!foundedPrefix || foundedPrefix->IsEmpty())
+		{
+			FString notFoundMessage = TEXT("Failed: Couldn't Find Prefix for ") + selectedObject->GetName() + TEXT("!");
+			ShowMessageDialog(EAppMsgType::Ok, notFoundMessage);
+			PrintLog(notFoundMessage);
+			Print(notFoundMessage, FColor::Red);
+			continue;
+		}
+
+		FString oldName = selectedObject->GetName();
+
+		if (oldName.StartsWith(*foundedPrefix))
+		{
+			FString notFoundMessage = TEXT("Failed: ") + selectedObject->GetName() + TEXT(" already has prefix!");
+			ShowMessageDialog(EAppMsgType::Ok, notFoundMessage);
+			PrintLog(notFoundMessage);
+			Print(notFoundMessage, FColor::Red);
+			continue;
+		}
+
+		const FString newNameWithPrefix = *foundedPrefix + oldName;
+		UEditorUtilityLibrary::RenameAsset(selectedObject, newNameWithPrefix);
+
+		counter++;
+	}
+
+	ShowNotifyInfo(TEXT("COMPLETED: ") + FString::FromInt(counter) + TEXT(" assets have been renamed successfully."));
+
+}

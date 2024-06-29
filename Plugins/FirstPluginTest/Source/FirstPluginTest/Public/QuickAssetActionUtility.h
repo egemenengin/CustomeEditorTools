@@ -14,10 +14,18 @@ class FIRSTPLUGINTEST_API UQuickAssetActionUtility : public UAssetActionUtility
 {
 	GENERATED_BODY()
 
-	public:
-		UFUNCTION(CallInEditor)
-		void TestFunc();
+public:
+	UFUNCTION(CallInEditor)
+	void TestFunc();
 
-		UFUNCTION(CallInEditor)
-		void DuplicateAsset(int NumOfDuplicate);
+	UFUNCTION(CallInEditor)
+	void DuplicateAsset(int NumOfDuplicate);
+	
+	UFUNCTION(CallInEditor)
+	void AddPrefix();
+private:
+	TMap<UClass*, FString> PrefixMap =
+	{
+		{UBlueprint::StaticClass(), TEXT("BP_")}
+	};
 };
