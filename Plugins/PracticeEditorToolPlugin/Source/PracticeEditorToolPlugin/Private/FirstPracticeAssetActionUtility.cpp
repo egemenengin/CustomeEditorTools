@@ -10,14 +10,17 @@ void UFirstPracticeAssetActionUtility::PracticeTest()
 {
 	PrintToLog(TEXT("Practice Message on BackLog"));
 	PrintToScreen(TEXT("Practice Message on Screen"), FColor::Blue);
+	ShowMessageLog(EAppMsgType::Ok, "TEST", false);
 }
 
 void UFirstPracticeAssetActionUtility::PracticeDuplicateAsset(int NumOfDuplicate)
 {
 	if (NumOfDuplicate <= 0)
 	{
+		
 		PrintToLog(TEXT("Enter Valid Number of Duplicate"));
 		PrintToScreen(TEXT("Enter Valid Number of Duplicate"), FColor::Red);
+		ShowMessageLog(EAppMsgType::Ok, TEXT("Enter Valid Number of Duplicate"));
 		return;
 	}
 	TArray<FAssetData> selectedAssetsData = UEditorUtilityLibrary::GetSelectedAssetData();
@@ -45,6 +48,7 @@ void UFirstPracticeAssetActionUtility::PracticeDuplicateAsset(int NumOfDuplicate
 		const FString duplicateEndMessage = TEXT("DUPLICATE | END: ") + assetData.AssetName.ToString() + TEXT(" duplicated") + FString::FromInt(counter) + TEXT(" times! ");
 		PrintToScreen(duplicateEndMessage, FColor::Emerald);
 		PrintToLog(duplicateEndMessage);
+		ShowNotification(duplicateEndMessage);
 		counter = 0;
 
 
