@@ -28,7 +28,11 @@ public class FirstPluginTest : ModuleRules
 			{
 				"Core",
                 "Blutility",
-                "EditorScriptingUtilities"
+                "EditorScriptingUtilities",
+                "UMG",
+                "Niagara",
+				"UnrealEd",
+				"AssetTools"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -40,7 +44,7 @@ public class FirstPluginTest : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore",
+				"SlateCore"
 				// ... add private dependencies that you statically link with here ...	
 			}
 			);

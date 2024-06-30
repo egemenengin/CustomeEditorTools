@@ -5,6 +5,12 @@
 #include "DebugHeader.h" 
 #include "EditorUtilityLibrary.h"
 #include "EditorAssetLibrary.h"
+#include "ObjectTools.h"
+
+#include "AssetToolsModule.h"
+#include "AssetViewUtils.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+
 
 
 void UQuickAssetActionUtility::TestFunc()
@@ -81,6 +87,11 @@ void UQuickAssetActionUtility::AddPrefix()
 			continue;
 		}
 
+		if (selectedObject->IsA<UMaterialInstanceConstant>())
+		{
+			oldName.RemoveFromStart(TEXT("M_"));
+			oldName.RemoveFromEnd(TEXT("_Inst"));
+		}
 		const FString newNameWithPrefix = *foundedPrefix + oldName;
 		UEditorUtilityLibrary::RenameAsset(selectedObject, newNameWithPrefix);
 
@@ -89,4 +100,93 @@ void UQuickAssetActionUtility::AddPrefix()
 
 	ShowNotifyInfo(TEXT("COMPLETED: ") + FString::FromInt(counter) + TEXT(" assets have been renamed successfully."));
 
+}
+
+void UQuickAssetActionUtility::RemoveUnusedAsset()
+{
+	FixUpRedirectors();
+
+
+	TArray<FAssetData> selectedAssetsData = UEditorUtilityLibrary::GetSelectedAssetData();
+	TArray<FAssetData> unusedAssetsData;
+
+
+	for (const FAssetData selectedAssetData : selectedAssetsData)
+	{
+		TArray<FString> assetReferences = UEditorAssetLibrary::FindPackageReferencersForAsset(selectedAssetData.ObjectPath.ToString());
+		if (assetReferences.Num() == 0)
+		{
+			unusedAssetsData.Add(selectedAssetData);
+		}
+	}
+	if (unusedAssetsData.Num() == 0)
+	{
+		ShowMessageDialog(EAppMsgType::Ok, TEXT("No unused asset found among selected assets!"), false);
+	}
+	else
+	{
+		const int32 numOfAssetsDeleted = ObjectTools::DeleteAssets(unusedAssetsData);
+		// FORCE DELETE: UEditorAssetLibrary::DeleteLoadedAssets(unusedAssetsData);
+
+		if (numOfAssetsDeleted > 0)
+		{
+			FString deletedSuccessMessage = TEXT("COMPLETED: Deleted ") + FString::FromInt(numOfAssetsDeleted) + TEXT(" Unused Assets.");
+			ShowNotifyInfo(deletedSuccessMessage);
+			Print(deletedSuccessMessage, FColor::Blue);
+			PrintLog(deletedSuccessMessage);
+		}
+
+	}
+
+}
+
+void UQuickAssetActionUtility::FixUpRedirectors()
+{
+	IAssetRegistry& AssetRegistry =
+		FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry")).Get();
+
+	// Form a filter from the paths
+	FARFilter Filter;
+	Filter.bRecursivePaths = true;
+	Filter.PackagePaths.Emplace("/Game");
+
+
+	Filter.ClassPaths.Add(UObjectRedirector::StaticClass()->GetClassPathName());
+
+	// Query for a list of assets in the selected paths
+	TArray<FAssetData> AssetList;
+	AssetRegistry.GetAssets(Filter, AssetList);
+
+	if (AssetList.Num() == 0) return;
+
+	TArray<FString> ObjectPaths;
+	for (const FAssetData& Asset : AssetList)
+	{
+		ObjectPaths.Add(Asset.GetObjectPathString());
+	}
+
+	TArray<UObject*> Objects;
+	const bool bAllowedToPromptToLoadAssets = true;
+	const bool bLoadRedirects = true;
+
+	AssetViewUtils::FLoadAssetsSettings Settings;
+	Settings.bFollowRedirectors = false;
+	Settings.bAllowCancel = true;
+
+	AssetViewUtils::ELoadAssetsResult Result = AssetViewUtils::LoadAssetsIfNeeded(ObjectPaths, Objects, Settings);
+
+	if (Result != AssetViewUtils::ELoadAssetsResult::Cancelled)
+	{
+		// Transform Objects array to ObjectRedirectors array
+		TArray<UObjectRedirector*> Redirectors;
+		for (UObject* Object : Objects)
+		{
+			Redirectors.Add(CastChecked<UObjectRedirector>(Object));
+		}
+
+		// Load the asset tools module
+		FAssetToolsModule& AssetToolsModule = FModuleManager::LoadModuleChecked<FAssetToolsModule>(TEXT("AssetTools"));
+		AssetToolsModule.Get().FixupReferencers(Redirectors);
+
+	}
 }
