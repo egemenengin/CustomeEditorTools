@@ -11,6 +11,9 @@
 #include "AssetToolsModule.h"
 #include "AssetViewUtils.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+
+using namespace DebugHeader;
+
 void UFirstPracticeAssetActionUtility::PracticeTest()
 {
 	PrintToLog(TEXT("Practice Message on BackLog"));
@@ -174,3 +177,5 @@ void UFirstPracticeAssetActionUtility::FixUpRedirectors()
 
 	}
 }
+
+

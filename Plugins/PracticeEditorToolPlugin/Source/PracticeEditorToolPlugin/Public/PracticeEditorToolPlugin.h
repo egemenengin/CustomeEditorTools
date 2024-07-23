@@ -12,4 +12,15 @@ public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+private:
+
+#pragma region ContentBrowserMenuExtension
+	void InitCBMenuExtension();
+
+	TSharedRef<FExtender> ExtendCBMenuBrowser(const TArray<FString>& SelectedPaths);
+	
+	void AddCBMenuEntry(class FMenuBuilder& menuBuilder);
+
+	void DeleteUnusedAssets();
+#pragma endregion
 };

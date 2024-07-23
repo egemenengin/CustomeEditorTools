@@ -13,18 +13,19 @@
 
 
 
+
 void UQuickAssetActionUtility::TestFunc()
 {
-	Print(TEXT("ITS WORKING!!!"), FColor::Purple);
-	PrintLog(TEXT("ITS WORKING!!!"));
+	DebugHeader::Print(TEXT("ITS WORKING!!!"), FColor::Purple);
+	DebugHeader::PrintLog(TEXT("ITS WORKING!!!"));
 }
 
 void UQuickAssetActionUtility::DuplicateAsset(int NumOfDuplicate)
 {
 	if (NumOfDuplicate <= 0)
 	{
-		Print(TEXT("Please Enter a Valid Number"), FColor::Red);
-		EAppReturnType::Type userReturnType = ShowMessageDialog(EAppMsgType::Ok, TEXT("Please Enter a Valid Number"));
+		DebugHeader::Print(TEXT("Please Enter a Valid Number"), FColor::Red);
+		EAppReturnType::Type userReturnType = DebugHeader::ShowMessageDialog(EAppMsgType::Ok, TEXT("Please Enter a Valid Number"));
 
 		return;
 
@@ -44,14 +45,14 @@ void UQuickAssetActionUtility::DuplicateAsset(int NumOfDuplicate)
 			UObject* duplicatedAsset = UEditorAssetLibrary::DuplicateAsset(sourceAssetPath, newAssetPath);
 			if (duplicatedAsset)
 			{
-				PrintLog(TEXT("CREATED: ") + duplicatedAsset->GetName());
+				DebugHeader::PrintLog(TEXT("CREATED: ") + duplicatedAsset->GetName());
 				UEditorAssetLibrary::SaveAsset(newAssetPath);
 				counter++;
 			}
 		}
 		const FString& duplicatedMessage = assetData.AssetName.ToString() + TEXT(" has been duplicated ") + FString::FromInt(counter) + TEXT(" times.");
-		PrintLog(duplicatedMessage);
-		ShowNotifyInfo(duplicatedMessage);
+		DebugHeader::PrintLog(duplicatedMessage);
+		DebugHeader::ShowNotifyInfo(duplicatedMessage);
 		counter = 0;
 	}
 }
@@ -70,9 +71,9 @@ void UQuickAssetActionUtility::AddPrefix()
 		if (!foundedPrefix || foundedPrefix->IsEmpty())
 		{
 			FString notFoundMessage = TEXT("Failed: Couldn't Find Prefix for ") + selectedObject->GetName() + TEXT("!");
-			ShowMessageDialog(EAppMsgType::Ok, notFoundMessage);
-			PrintLog(notFoundMessage);
-			Print(notFoundMessage, FColor::Red);
+			DebugHeader::ShowMessageDialog(EAppMsgType::Ok, notFoundMessage);
+			DebugHeader::PrintLog(notFoundMessage);
+			DebugHeader::Print(notFoundMessage, FColor::Red);
 			continue;
 		}
 
@@ -81,9 +82,9 @@ void UQuickAssetActionUtility::AddPrefix()
 		if (oldName.StartsWith(*foundedPrefix))
 		{
 			FString notFoundMessage = TEXT("Failed: ") + selectedObject->GetName() + TEXT(" already has prefix!");
-			ShowMessageDialog(EAppMsgType::Ok, notFoundMessage);
-			PrintLog(notFoundMessage);
-			Print(notFoundMessage, FColor::Red);
+			DebugHeader::ShowMessageDialog(EAppMsgType::Ok, notFoundMessage);
+			DebugHeader::PrintLog(notFoundMessage);
+			DebugHeader::Print(notFoundMessage, FColor::Red);
 			continue;
 		}
 
@@ -98,7 +99,7 @@ void UQuickAssetActionUtility::AddPrefix()
 		counter++;
 	}
 
-	ShowNotifyInfo(TEXT("COMPLETED: ") + FString::FromInt(counter) + TEXT(" assets have been renamed successfully."));
+	DebugHeader::ShowNotifyInfo(TEXT("COMPLETED: ") + FString::FromInt(counter) + TEXT(" assets have been renamed successfully."));
 
 }
 
@@ -121,7 +122,7 @@ void UQuickAssetActionUtility::RemoveUnusedAsset()
 	}
 	if (unusedAssetsData.Num() == 0)
 	{
-		ShowMessageDialog(EAppMsgType::Ok, TEXT("No unused asset found among selected assets!"), false);
+		DebugHeader::ShowMessageDialog(EAppMsgType::Ok, TEXT("No unused asset found among selected assets!"), false);
 	}
 	else
 	{
@@ -131,9 +132,9 @@ void UQuickAssetActionUtility::RemoveUnusedAsset()
 		if (numOfAssetsDeleted > 0)
 		{
 			FString deletedSuccessMessage = TEXT("COMPLETED: Deleted ") + FString::FromInt(numOfAssetsDeleted) + TEXT(" Unused Assets.");
-			ShowNotifyInfo(deletedSuccessMessage);
-			Print(deletedSuccessMessage, FColor::Blue);
-			PrintLog(deletedSuccessMessage);
+			DebugHeader::ShowNotifyInfo(deletedSuccessMessage);
+			DebugHeader::Print(deletedSuccessMessage, FColor::Blue);
+			DebugHeader::PrintLog(deletedSuccessMessage);
 		}
 
 	}
