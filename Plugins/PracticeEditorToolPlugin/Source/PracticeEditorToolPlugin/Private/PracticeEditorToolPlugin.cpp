@@ -3,6 +3,8 @@
 #include "PracticeEditorToolPlugin.h"
 #include "ContentBrowserModule.h"
 #include "PracticeDebugHeader.h"
+#include "EditorAssetLibrary.h"
+#include "ObjectTools.h"
 
 using namespace DebugHeader;
 
@@ -37,6 +39,7 @@ TSharedRef<FExtender> FPracticeEditorToolPluginModule::ExtendCBMenuBrowser(const
 		menuExtensionDelegate.BindRaw(this, &FPracticeEditorToolPluginModule::AddCBMenuEntry);
 		menuExtender->AddMenuExtension(FName("Delete"), EExtensionHook::After, TSharedPtr<FUICommandList>(), menuExtensionDelegate);
 
+		SelectedFolderPaths = SelectedPaths;
 	}
 	return menuExtender;
 }
@@ -54,7 +57,75 @@ void FPracticeEditorToolPluginModule::AddCBMenuEntry(FMenuBuilder& menuBuilder)
 
 void FPracticeEditorToolPluginModule::DeleteUnusedAssets()
 {
-	PrintToLog(TEXT("WORKING!!!"));
+	if (SelectedFolderPaths.Num() > 1)
+	{
+		FString oneFolderErrorMsg = TEXT("Please select one folder.");
+		ShowMessageLog(EAppMsgType::Ok, oneFolderErrorMsg);
+		PrintToLog(oneFolderErrorMsg);
+		return;
+	}
+	const FString selectedFolderPath = SelectedFolderPaths[0];
+	PrintToLog(TEXT("Selected Path: ") + selectedFolderPath);
+
+	// Assets paths
+	TArray<FString> assetsPaths = UEditorAssetLibrary::ListAssets(selectedFolderPath);
+
+	if (assetsPaths.Num() == 0)
+	{
+		FString noAssetErrorMsg = TEXT("No asset were found asset under ") + selectedFolderPath + TEXT(" folder.");
+		ShowMessageLog(EAppMsgType::Ok, noAssetErrorMsg);
+		PrintToLog(noAssetErrorMsg);
+		return;
+	}
+
+	// Confirmation
+	const FString confirmationMsg = TEXT("There are ") + FString::FromInt(assetsPaths.Num()) +
+										TEXT(" assets under selected folder.\nWould you like to proceed?");
+	EAppReturnType::Type confirmationResult = ShowMessageLog(EAppMsgType::YesNo, confirmationMsg, false);
+
+
+	if (confirmationResult == EAppReturnType::Yes)
+	{
+		TArray<FAssetData> unusedAssetsData;
+		for (FString assetPath : assetsPaths)
+		{
+			// Do not touch root folders.
+			if (assetPath.Contains("Developer") ||
+				assetPath.Contains("Collections"))
+			{
+				continue;
+			}
+
+			PrintToLog(TEXT("Current Asset Path: ") + assetPath);
+
+			TArray<FString> assetReferencers = UEditorAssetLibrary::FindPackageReferencersForAsset(assetPath);
+
+			if (assetReferencers.Num() == 0)
+			{
+				const FAssetData currentAssetData = UEditorAssetLibrary::FindAssetData(assetPath);
+				PrintToLog(currentAssetData.AssetName.ToString() + TEXT(" has no reference."));
+				unusedAssetsData.Add(currentAssetData);
+			}
+			else
+			{
+				PrintToLog(TEXT("The asset has referencers."));
+			}
+
+		}
+		if (unusedAssetsData.Num() == 0)
+		{
+			FString noUnusedAssetMsg = TEXT("No unused assets found under selected folder!");
+			ShowMessageLog(EAppMsgType::Ok, noUnusedAssetMsg);
+		}
+		else
+		{
+			int numOfDeletedUnusedAssets = ObjectTools::DeleteAssets(unusedAssetsData);
+			FString deletionCompleted = FString::FromInt(numOfDeletedUnusedAssets) +
+											TEXT(" assets under selected folder have been deleted successfully.");
+			ShowNotification(deletionCompleted);
+			PrintToLog(deletionCompleted);
+		}
+	}
 }
 
 #pragma endregion
