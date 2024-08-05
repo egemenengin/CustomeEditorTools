@@ -16,6 +16,8 @@ public:
 private:
 	
 #pragma region ContentBrowserMenuExtension
+	
+	TArray<FString> SelectedFolderPaths;
 
 	void InitCBMenuExtension();
 
@@ -25,7 +27,8 @@ private:
 
 	void OnDeleteUnusedAssetsButtonClicked();
 
-	TArray<FString> SelectedFolderPaths;
+	void OnDeleteEmptyFoldersButtonClicked();
+	void FixUpRedirectors();
 #pragma endregion
 
 };

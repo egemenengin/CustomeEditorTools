@@ -125,6 +125,8 @@ void FPracticeEditorToolPluginModule::DeleteUnusedAssets()
 			ShowNotification(deletionCompleted);
 			PrintToLog(deletionCompleted);
 		}
+
+		
 	}
 }
 
