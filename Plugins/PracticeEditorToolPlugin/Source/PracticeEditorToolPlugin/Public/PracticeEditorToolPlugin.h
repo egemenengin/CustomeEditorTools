@@ -24,5 +24,9 @@ private:
 	void AddCBMenuEntry(class FMenuBuilder& menuBuilder);
 
 	void DeleteUnusedAssets();
+
+	void DeleteEmtpyFolders();
+
+	void FixUpRedirectors();
 #pragma endregion
 };

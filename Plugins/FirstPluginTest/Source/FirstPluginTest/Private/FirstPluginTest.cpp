@@ -149,7 +149,7 @@ void FFirstPluginTestModule::OnDeleteEmptyFoldersButtonClicked()
 
 	TArray<FString> foldersPaths = UEditorAssetLibrary::ListAssets(SelectedFolderPaths[0], true, true);
 
-	FString currentEmptyFolderPath;
+	FString emptyFolderPathsText;
 	TArray<FString> emptyFoldersPaths;
 
 	for (const FString& folderPath : foldersPaths)
@@ -166,7 +166,7 @@ void FFirstPluginTestModule::OnDeleteEmptyFoldersButtonClicked()
 		
 		if (!UEditorAssetLibrary::DoesDirectoryHaveAssets(folderPath))
 		{
-			currentEmptyFolderPath.Append(folderPath + TEXT("\n"));
+			emptyFolderPathsText.Append(folderPath + TEXT("\n"));
 			emptyFoldersPaths.Add(folderPath);
 		}
 
@@ -180,7 +180,7 @@ void FFirstPluginTestModule::OnDeleteEmptyFoldersButtonClicked()
 	}
 	else
 	{
-		FString foundedEmptyFolders = TEXT("Empty folders found under ") + SelectedFolderPaths[0] + TEXT(":\n") + currentEmptyFolderPath + 
+		FString foundedEmptyFolders = TEXT("Empty folders found under ") + SelectedFolderPaths[0] + TEXT(":\n") + emptyFolderPathsText + 
 									  TEXT("Would you like to delete all?");
 		EAppReturnType::Type confirmationAnswer = DebugHeader::ShowMessageDialog(EAppMsgType::YesNo, foundedEmptyFolders);
 		
